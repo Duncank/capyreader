@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Article
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.SnackbarHost
@@ -116,7 +117,7 @@ fun ArticleView(
             LOAD_FULL_CONTENT -> onToggleFullContent()
             OPEN_ARTICLE_IN_BROWSER -> openLink()
             PREVIOUS_ARTICLE -> selectPrevious()
-            NEXT_ARTICLE -> selectNext()
+            NEXT_ARTICLE -> if (hasNext) selectNext() else onBackPressed()
             DISABLED -> {}
         }
     }
@@ -257,8 +258,9 @@ fun ArticlePullRefresh(
     val enableTopSwipe = topSwipe.enabled &&
             (topSwipe != PREVIOUS_ARTICLE || (topSwipe.openArticle && hasPreviousArticle))
 
-    val enableBottomSwipe = bottomSwipe.enabled &&
-            (bottomSwipe != NEXT_ARTICLE || (bottomSwipe.openArticle && hasNextArticle))
+    // Past the last article, swiping up for the next article returns to the list instead.
+    val enableBottomSwipe = bottomSwipe.enabled
+    val closesArticle = bottomSwipe == NEXT_ARTICLE && !hasNextArticle
 
     SwipeRefresh(
         onRefresh = { onSwipe(topSwipe) },
@@ -275,7 +277,7 @@ fun ArticlePullRefresh(
             swipeEnabled = enableBottomSwipe,
             icon = swipeIcon(
                 bottomSwipe,
-                relatedArticleIcon = Icons.Rounded.KeyboardArrowDown
+                relatedArticleIcon = if (closesArticle) Icons.Rounded.Close else Icons.Rounded.KeyboardArrowDown
             ),
             onTriggerThreshold = { triggerThreshold() },
             indicatorAlignment = Alignment.BottomCenter,
