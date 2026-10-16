@@ -25,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -41,6 +42,7 @@ import com.capyreader.app.ui.isSinglePane
 import com.jocmp.capy.Article
 import com.jocmp.capy.MarkRead
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import org.koin.compose.koinInject
 import java.time.LocalDateTime
 
@@ -145,6 +147,52 @@ fun ScrollToSelectedArticleEffect(
         if (index > -1 && listState.layoutInfo.visibleItemsInfo.none { it.index == index }) {
             listState.animateScrollToItem(index)
         }
+    }
+}
+
+/**
+ * On a phone the list leaves composition while the reader is open, so stepping next/previous in the
+ * reader isn't reflected in the list. When the list returns, bring the last opened article into
+ * view, paging further into the list if needed.
+ */
+@Composable
+fun RestoreListPositionEffect(
+    lastOpenedArticleID: String?,
+    articles: LazyPagingItems<Article>,
+    listState: LazyListState,
+    enabled: Boolean,
+    onRestored: () -> Unit,
+) {
+    val isSinglePane = isSinglePane()
+
+    LaunchedEffect(lastOpenedArticleID, articles.itemCount, listState) {
+        val id = lastOpenedArticleID ?: return@LaunchedEffect
+        if (!isSinglePane || articles.itemCount == 0) return@LaunchedEffect
+
+        if (!enabled) {
+            onRestored()
+            return@LaunchedEffect
+        }
+
+        val index = articles.itemSnapshotList.indexOfFirst { it?.id == id }
+
+        if (index == -1) {
+            if (articles.loadState.append.endOfPaginationReached) {
+                onRestored()
+            } else {
+                // Accessing the last item loads the next page, which restarts this effect.
+                articles[articles.itemCount - 1]
+            }
+            return@LaunchedEffect
+        }
+
+        snapshotFlow { listState.layoutInfo.totalItemsCount }.first { it > 0 }
+
+        if (listState.layoutInfo.visibleItemsInfo.none { it.index == index }) {
+            listState.scrollToItem(index)
+        }
+
+        onRestored()
     }
 }
 
