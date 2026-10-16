@@ -24,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -70,6 +71,18 @@ fun App(
         onDeepLinkConsumed()
         backStack.clear()
         backStack.addAll(target)
+    }
+
+    val openArticleID = (backStack.lastOrNull() as? Route.ArticleDetail)?.articleID
+
+    // The article to bring into view when the list returns, after stepping through articles in
+    // the reader. Cleared by the list once handled.
+    var lastOpenedArticleID by rememberSaveable { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(openArticleID) {
+        if (openArticleID != null) {
+            lastOpenedArticleID = openArticleID
+        }
     }
 
     val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
@@ -171,7 +184,9 @@ fun App(
                             },
                             onNavigateToSettings = { backStack.add(Route.Settings) },
                             onCloseArticle = { backStack.closeArticle() },
-                            selectedArticleID = (backStack.lastOrNull() as? Route.ArticleDetail)?.articleID,
+                            selectedArticleID = openArticleID,
+                            lastOpenedArticleID = lastOpenedArticleID,
+                            onListPositionRestored = { lastOpenedArticleID = null },
                         )
                     }
                     entry<Route.ArticleDetail>(

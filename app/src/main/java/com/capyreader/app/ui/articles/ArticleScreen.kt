@@ -117,6 +117,8 @@ fun ArticleScreen(
     viewModel: ArticleScreenViewModel = koinViewModel(),
     appPreferences: AppPreferences = koinInject(),
     selectedArticleID: String? = null,
+    lastOpenedArticleID: String? = null,
+    onListPositionRestored: () -> Unit = {},
 ) {
     val currentFeed by viewModel.currentFeed.collectAsStateWithLifecycle(initialValue = null)
     val feeds by viewModel.topLevelFeeds.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -247,6 +249,15 @@ fun ArticleScreen(
             selectedArticleKey = selectedArticleID,
             articles = articles,
             listState = listState,
+        )
+
+        RestoreListPositionEffect(
+            lastOpenedArticleID = lastOpenedArticleID,
+            articles = articles,
+            listState = listState,
+            // Mark read on scroll keeps the list at the top and would mark everything above as read.
+            enabled = !viewModel.markReadOnScrollEnabled,
+            onRestored = onListPositionRestored,
         )
 
         val newArticles = rememberNewArticlesIndicator(
