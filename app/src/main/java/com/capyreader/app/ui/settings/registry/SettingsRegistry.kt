@@ -43,6 +43,7 @@ object SettingsRegistry {
                     title = R.string.settings_section_refresh,
                     settings = listOf(
                         Setting.REFRESH_INTERVAL,
+                        Setting.REFRESH_ON_OPEN,
                         Setting.REFRESH_ON_WIFI_ONLY,
                         Setting.LAST_REFRESHED,
                     ),
@@ -191,6 +192,7 @@ object SettingsRegistry {
             Setting.ACCOUNT -> R.string.settings_section_account
             Setting.SERVER -> R.string.settings_section_account_server
             Setting.REFRESH_INTERVAL -> R.string.refresh_feeds_menu_label
+            Setting.REFRESH_ON_OPEN -> R.string.settings_refresh_on_open
             Setting.REFRESH_ON_WIFI_ONLY -> R.string.settings_refresh_on_wifi_only
             Setting.LAST_REFRESHED -> R.string.settings_last_refreshed
             Setting.OPML_IMPORT -> R.string.opml_import_button_text

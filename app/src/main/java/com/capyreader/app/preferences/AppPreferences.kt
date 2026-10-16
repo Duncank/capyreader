@@ -76,6 +76,9 @@ class AppPreferences(context: Context) {
     val refreshOnWiFiOnly: Preference<Boolean>
         get() = preferenceStore.getBoolean("refresh_on_wifi_only", false)
 
+    val refreshOnOpen: Preference<Boolean>
+        get() = preferenceStore.getBoolean("refresh_on_open", false)
+
     val reduceMotion: Preference<Boolean>
         get() = preferenceStore.getBoolean("reduce_motion", false)
 

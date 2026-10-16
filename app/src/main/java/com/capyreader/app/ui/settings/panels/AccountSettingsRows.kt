@@ -84,6 +84,17 @@ fun RefreshOnWiFiOnlyRow(viewModel: GeneralSettingsViewModel = koinViewModel()) 
 }
 
 @Composable
+fun RefreshOnOpenRow(viewModel: GeneralSettingsViewModel = koinViewModel()) {
+    RowItem {
+        TextSwitch(
+            checked = viewModel.refreshOnOpen,
+            onCheckedChange = viewModel::updateRefreshOnOpen,
+            title = stringResource(R.string.settings_refresh_on_open),
+        )
+    }
+}
+
+@Composable
 fun LastRefreshedRow(viewModel: AccountSettingsViewModel = koinViewModel()) {
     val lastRefreshedAt by viewModel.lastRefreshedAt.collectAsState()
 

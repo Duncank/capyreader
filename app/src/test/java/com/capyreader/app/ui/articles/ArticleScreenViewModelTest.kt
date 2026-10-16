@@ -1,6 +1,9 @@
 package com.capyreader.app.ui.articles
 
 import android.app.Application
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import app.cash.turbine.test
 import com.capyreader.app.notifications.NotificationHelper
 import com.capyreader.app.preferences.AppPreferences
@@ -106,6 +109,64 @@ class ArticleScreenViewModelTest {
         val viewModel = buildViewModel()
 
         assertTrue(viewModel.refreshInitialized)
+        assertFalse(viewModel.refreshingAll)
+    }
+
+    @Test
+    fun `refreshes when the app comes to the foreground`() = runTest {
+        every { account.preferences.lastRefreshedAt.get() } returns
+            ZonedDateTime.parse("2023-11-14T22:13:20Z").toEpochSecond()
+        appPreferences.refreshOnOpen.set(true)
+        val process = TestProcessLifecycle()
+
+        val viewModel = buildViewModel(processLifecycle = process.lifecycle)
+
+        assertFalse(viewModel.refreshingAll)
+
+        process.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+
+        assertTrue(viewModel.refreshingAll)
+    }
+
+    @Test
+    fun `skips refresh on open when the setting is off`() = runTest {
+        every { account.preferences.lastRefreshedAt.get() } returns
+            ZonedDateTime.parse("2023-11-14T22:13:20Z").toEpochSecond()
+        val process = TestProcessLifecycle()
+
+        val viewModel = buildViewModel(processLifecycle = process.lifecycle)
+
+        process.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+
+        assertFalse(viewModel.refreshingAll)
+    }
+
+    @Test
+    fun `skips refresh on open while reading an article`() = runTest {
+        every { account.preferences.lastRefreshedAt.get() } returns
+            ZonedDateTime.parse("2023-11-14T22:13:20Z").toEpochSecond()
+        appPreferences.refreshOnOpen.set(true)
+        val process = TestProcessLifecycle()
+
+        val viewModel = buildViewModel(processLifecycle = process.lifecycle)
+        viewModel.isListInFocus = false
+
+        process.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+
+        assertFalse(viewModel.refreshingAll)
+    }
+
+    @Test
+    fun `skips refresh on open right after a refresh`() = runTest {
+        every { account.preferences.lastRefreshedAt.get() } returns
+            ZonedDateTime.now().toEpochSecond()
+        appPreferences.refreshOnOpen.set(true)
+        val process = TestProcessLifecycle()
+
+        val viewModel = buildViewModel(processLifecycle = process.lifecycle)
+
+        process.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+
         assertFalse(viewModel.refreshingAll)
     }
 
@@ -319,6 +380,7 @@ class ArticleScreenViewModelTest {
 
     private fun buildViewModel(
         syncFlushInterval: kotlin.time.Duration? = null,
+        processLifecycle: Lifecycle = TestProcessLifecycle().lifecycle,
     ): ArticleScreenViewModel {
         val application = RuntimeEnvironment.getApplication() as Application
 
@@ -330,6 +392,11 @@ class ArticleScreenViewModelTest {
             ioDispatcher = testDispatcher,
             syncFlushInterval = syncFlushInterval,
             articleCutoff = ArticleSessionCutoff(),
+            processLifecycle = processLifecycle,
         )
+    }
+
+    private class TestProcessLifecycle : LifecycleOwner {
+        override val lifecycle = LifecycleRegistry.createUnsafe(this)
     }
 }

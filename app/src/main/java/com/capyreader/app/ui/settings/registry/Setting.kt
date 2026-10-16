@@ -4,6 +4,7 @@ enum class Setting {
     ACCOUNT,
     SERVER,
     REFRESH_INTERVAL,
+    REFRESH_ON_OPEN,
     REFRESH_ON_WIFI_ONLY,
     LAST_REFRESHED,
     OPML_IMPORT,

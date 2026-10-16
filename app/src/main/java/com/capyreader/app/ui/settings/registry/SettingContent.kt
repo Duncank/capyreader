@@ -35,6 +35,7 @@ import com.capyreader.app.ui.settings.panels.ReaderSwipeDownRow
 import com.capyreader.app.ui.settings.panels.ReaderSwipeUpRow
 import com.capyreader.app.ui.settings.panels.ReduceMotionRow
 import com.capyreader.app.ui.settings.panels.RefreshIntervalRow
+import com.capyreader.app.ui.settings.panels.RefreshOnOpenRow
 import com.capyreader.app.ui.settings.panels.RefreshOnWiFiOnlyRow
 import com.capyreader.app.ui.settings.panels.RemoveAccountRow
 import com.capyreader.app.ui.settings.panels.ShortenTitlesRow
@@ -59,6 +60,7 @@ fun SettingContent(
         Setting.ACCOUNT -> AccountNameRow()
         Setting.SERVER -> AccountServerRow()
         Setting.REFRESH_INTERVAL -> RefreshIntervalRow()
+        Setting.REFRESH_ON_OPEN -> RefreshOnOpenRow()
         Setting.REFRESH_ON_WIFI_ONLY -> RefreshOnWiFiOnlyRow()
         Setting.LAST_REFRESHED -> LastRefreshedRow()
         Setting.OPML_IMPORT -> OPMLImportRow()

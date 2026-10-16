@@ -65,6 +65,14 @@ class GeneralSettingsViewModel(
         refreshOnWiFiOnly = enabled
     }
 
+    var refreshOnOpen by mutableStateOf(appPreferences.refreshOnOpen.get())
+        private set
+
+    fun updateRefreshOnOpen(enabled: Boolean) {
+        appPreferences.refreshOnOpen.set(enabled)
+        refreshOnOpen = enabled
+    }
+
     val filterKeywords = account
         .preferences
         .filterKeywords

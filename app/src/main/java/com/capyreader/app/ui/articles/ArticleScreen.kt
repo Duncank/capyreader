@@ -237,6 +237,12 @@ fun ArticleScreen(
             }
         }
 
+        // On a phone the list leaves composition while the reader is open.
+        DisposableEffect(selectedArticleID) {
+            viewModel.isListInFocus = selectedArticleID == null
+            onDispose { viewModel.isListInFocus = false }
+        }
+
         ScrollToSelectedArticleEffect(
             selectedArticleKey = selectedArticleID,
             articles = articles,

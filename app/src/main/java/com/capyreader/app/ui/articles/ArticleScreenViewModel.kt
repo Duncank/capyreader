@@ -7,6 +7,10 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -34,6 +38,7 @@ import com.jocmp.capy.MarkRead
 import com.jocmp.capy.SavedSearch
 import com.jocmp.capy.articles.ArticleContent
 import com.jocmp.capy.articles.SidebarItem
+import com.jocmp.capy.common.TimeHelpers
 import com.jocmp.capy.common.UnauthorizedError
 import com.jocmp.capy.common.launchIO
 import com.jocmp.capy.common.launchUI
@@ -72,8 +77,21 @@ class ArticleScreenViewModel(
     private val articleCutoff: ArticleSessionCutoff,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val syncFlushInterval: Duration? = SYNC_FLUSH_INTERVAL,
+    private val processLifecycle: Lifecycle = ProcessLifecycleOwner.get().lifecycle,
 ) : AndroidViewModel(application) {
     private var refreshJob: Job? = null
+
+    /**
+     * True while the list is on screen without an open article. Refresh on open is skipped while
+     * reading since a refresh restarts the list session, which moves the reader's neighbor cutoff.
+     */
+    var isListInFocus = true
+
+    private val refreshOnOpenObserver = object : DefaultLifecycleObserver {
+        override fun onStart(owner: LifecycleOwner) {
+            refreshOnOpen()
+        }
+    }
 
     var refreshSkipReason by mutableStateOf<RefreshSkipReason?>(null)
         private set
@@ -364,6 +382,9 @@ class ArticleScreenViewModel(
         } else {
             refreshAll()
         }
+
+        processLifecycle.addObserver(refreshOnOpenObserver)
+        addCloseable { processLifecycle.removeObserver(refreshOnOpenObserver) }
     }
 
     fun selectArticleFilter() {
@@ -536,6 +557,30 @@ class ArticleScreenViewModel(
             resetScrollHighWaterMark()
             onComplete()
         }
+    }
+
+    /**
+     * Called when the app comes to the foreground, including the first start. Unlike a manual
+     * refresh, a skipped refresh on mobile data stays silent.
+     */
+    private fun refreshOnOpen() {
+        if (!appPreferences.refreshOnOpen.get() || !isListInFocus) {
+            return
+        }
+
+        if (appPreferences.refreshOnWiFiOnly.get() && !application.isOnWifi()) {
+            return
+        }
+
+        val sinceLastRefresh =
+            TimeHelpers.nowUTC().toEpochSecond() - account.preferences.lastRefreshedAt.get()
+
+        if (sinceLastRefresh < REFRESH_ON_OPEN_INTERVAL.inWholeSeconds) {
+            return
+        }
+
+        CapyLog.info("refresh_on_open")
+        refreshAll()
     }
 
     fun refreshAll(onComplete: () -> Unit = {}) {
@@ -851,6 +896,9 @@ class ArticleScreenViewModel(
 
     companion object {
         val SYNC_FLUSH_INTERVAL = 2.minutes
+
+        /** Avoids refreshing again when quickly switching back and forth between apps. */
+        val REFRESH_ON_OPEN_INTERVAL = 1.minutes
     }
 }
 
