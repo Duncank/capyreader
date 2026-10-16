@@ -100,6 +100,9 @@ class AppPreferences(context: Context) {
         val pinToolbars: Preference<Boolean>
             get() = preferenceStore.getBoolean("article_pin_top_bar", false)
 
+        val showOpenInBrowserButton: Preference<Boolean>
+            get() = preferenceStore.getBoolean("article_show_open_in_browser_button", false)
+
         val fontSize: Preference<Int>
             get() = preferenceStore.getInt("article_font_size", FontSize.DEFAULT)
 
