@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.outlined.FiberManualRecord
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.FiberManualRecord
@@ -55,6 +56,8 @@ fun ArticleBottomBar(
     onToggleRead: () -> Unit,
     onToggleStar: () -> Unit,
     onSelectNext: () -> Unit,
+    showOpenInBrowser: Boolean = false,
+    onOpenInBrowser: () -> Unit = {},
 ) {
     val context = LocalContext.current
 
@@ -130,6 +133,23 @@ fun ArticleBottomBar(
                             Icon(
                                 painterResource(id = extractIcon(article.fullContent)),
                                 contentDescription = stringResource(R.string.extract_full_content),
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
+                }
+                if (showOpenInBrowser) {
+                    ToolbarTooltip(
+                        positioning = TooltipAnchorPosition.Above,
+                        message = stringResource(R.string.article_vertical_open_article_in_browser)
+                    ) {
+                        IconButton(
+                            enabled = article.url != null,
+                            onClick = { onOpenInBrowser() },
+                        ) {
+                            Icon(
+                                Icons.AutoMirrored.Rounded.OpenInNew,
+                                contentDescription = stringResource(R.string.article_vertical_open_article_in_browser),
                                 modifier = Modifier.size(24.dp)
                             )
                         }

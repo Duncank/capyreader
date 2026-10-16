@@ -123,6 +123,7 @@ fun ArticleView(
     }
 
     val pinToolbars by appPreferences.readerOptions.pinToolbars.collectChangesWithDefault()
+    val showOpenInBrowser by appPreferences.readerOptions.showOpenInBrowserButton.collectChangesWithDefault()
     val scrollState = rememberArticleScrollState()
     val showToolBar = pinToolbars || !scrollState.isScrollingDown
 
@@ -227,6 +228,8 @@ fun ArticleView(
                 onToggleRead = onToggleRead,
                 onToggleStar = onToggleStar,
                 onSelectNext = { selectNext() },
+                showOpenInBrowser = showOpenInBrowser,
+                onOpenInBrowser = openLink,
             )
 
             SnackbarHost(

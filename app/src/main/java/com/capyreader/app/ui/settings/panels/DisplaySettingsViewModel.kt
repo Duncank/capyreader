@@ -64,6 +64,8 @@ class DisplaySettingsViewModel(
 
     val pinArticleBars = appPreferences.readerOptions.pinToolbars
 
+    val showOpenInBrowserButton = appPreferences.readerOptions.showOpenInBrowserButton
+
     var imageVisibility by mutableStateOf(appPreferences.readerOptions.imageVisibility.get())
         private set
 
@@ -84,6 +86,10 @@ class DisplaySettingsViewModel(
 
     fun updatePinArticleBars(pinBars: Boolean) {
         appPreferences.readerOptions.pinToolbars.set(pinBars)
+    }
+
+    fun updateShowOpenInBrowserButton(show: Boolean) {
+        appPreferences.readerOptions.showOpenInBrowserButton.set(show)
     }
 
     fun updateFontScale(fontScale: ArticleListFontScale) {

@@ -115,6 +115,7 @@ object SettingsRegistry {
                         Setting.READER_IMAGES,
                         Setting.STICKY_FULL_CONTENT,
                         Setting.PIN_TOOLBARS,
+                        Setting.OPEN_IN_BROWSER_BUTTON,
                     ),
                 ),
                 SettingsSection(
@@ -221,6 +222,7 @@ object SettingsRegistry {
             Setting.READER_IMAGES -> R.string.reader_image_visibility_label
             Setting.STICKY_FULL_CONTENT -> R.string.settings_option_full_content_title
             Setting.PIN_TOOLBARS -> R.string.settings_options_reader_pin_top_toolbar
+            Setting.OPEN_IN_BROWSER_BUTTON -> R.string.settings_option_open_in_browser_button
             Setting.IN_APP_BROWSER -> R.string.settings_option_in_app_browser
             Setting.READER_SWIPE_DOWN -> R.string.settings_gestures_reader_swipe_down
             Setting.READER_SWIPE_UP -> R.string.settings_gestures_reader_swipe_up

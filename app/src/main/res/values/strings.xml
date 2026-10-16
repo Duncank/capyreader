@@ -169,6 +169,7 @@
     <string name="theme_menu_option_system_default">System default</string>
     <string name="edit_feed_folders">Folders</string>
     <string name="settings_option_in_app_browser">Use in-app browser</string>
+    <string name="settings_option_open_in_browser_button">Open in Browser Button</string>
     <string name="opml_import_notification_cancel">Stop</string>
     <string name="image_preview_menu_option_none">None</string>
     <string name="image_preview_menu_option_small">Small</string>

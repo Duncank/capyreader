@@ -57,6 +57,19 @@ fun PinToolbarsRow(viewModel: DisplaySettingsViewModel = koinViewModel()) {
 }
 
 @Composable
+fun OpenInBrowserButtonRow(viewModel: DisplaySettingsViewModel = koinViewModel()) {
+    val showButton by viewModel.showOpenInBrowserButton.collectChangesWithCurrent()
+
+    RowItem {
+        TextSwitch(
+            checked = showButton,
+            onCheckedChange = viewModel::updateShowOpenInBrowserButton,
+            title = stringResource(R.string.settings_option_open_in_browser_button),
+        )
+    }
+}
+
+@Composable
 fun InAppBrowserRow(viewModel: GeneralSettingsViewModel = koinViewModel()) {
     RowItem {
         TextSwitch(

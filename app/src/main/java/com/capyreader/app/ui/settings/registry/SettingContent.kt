@@ -27,6 +27,7 @@ import com.capyreader.app.ui.settings.panels.MarkReadOnScrollRow
 import com.capyreader.app.ui.settings.panels.OPMLExportRow
 import com.capyreader.app.ui.settings.panels.OPMLImportRow
 import com.capyreader.app.ui.settings.panels.PageTurnKeysRow
+import com.capyreader.app.ui.settings.panels.OpenInBrowserButtonRow
 import com.capyreader.app.ui.settings.panels.PinToolbarsRow
 import com.capyreader.app.ui.settings.panels.PureBlackRow
 import com.capyreader.app.ui.settings.panels.ReaderImagesRow
@@ -89,6 +90,7 @@ fun SettingContent(
         Setting.READER_IMAGES -> ReaderImagesRow()
         Setting.STICKY_FULL_CONTENT -> StickyFullContentRow()
         Setting.PIN_TOOLBARS -> PinToolbarsRow()
+        Setting.OPEN_IN_BROWSER_BUTTON -> OpenInBrowserButtonRow()
         Setting.IN_APP_BROWSER -> InAppBrowserRow()
         Setting.READER_SWIPE_DOWN -> ReaderSwipeDownRow()
         Setting.READER_SWIPE_UP -> ReaderSwipeUpRow()
